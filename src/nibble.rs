@@ -60,8 +60,4 @@ impl u4 {
 		let sum = self.0 + rhs.0;
 		(Self(sum & 0xF), Self(sum >> 4))
 	}
-	pub fn sub_with_carry(self, rhs: u4) -> (u4, u4) {
-		let sum = self.0 - rhs.0;
-		(Self(sum & 0xF), Self(sum >> 4))
-	}
 }
