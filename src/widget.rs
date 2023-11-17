@@ -7,11 +7,12 @@ pub struct Widget {
 	pub vm: Vm,
 	pub other_vms: Vec<Vm>,
 	pub write_target: u8,
+	pub memory: [Option<u4>; 256],
 }
 
 const CELL_DIM: f32 = 15.0;
 impl Widget {
-	pub fn show(&self, ui: &mut egui::Ui) -> egui::Response {
+	pub fn show(&mut self, ui: &mut egui::Ui) -> egui::Response {
 		ui.vertical(|ui| {
 			let table = TableBuilder::new(ui);
 			let mut vm = self.vm.clone();
@@ -32,8 +33,10 @@ impl Widget {
 						for low in 0..16u8 {
 							row.col(|ui| {
 								let addr = u4::combine([high.into(), low.into()]);
-								let is_open = smol::block_on(vm.is_open_bus(addr));
-								let value: u8 = smol::block_on(vm.read(addr)).into();
+								let is_open = vm.is_open_bus(&self.memory, addr);
+								let old_read_reg = vm.last_read;
+								let value: u8 = vm.read(&self.memory, addr).into();
+								vm.last_read = old_read_reg;
 								let value = char::from_digit(value as u32, 16).unwrap();
 								let value = format!(
 									"{value}{}",
