@@ -1,0 +1,25 @@
+(Stack padding)
+.x0000
+(Initialize increment location with zero)
+<x0
+<'add_loc
+s
+(Loop point)
+'start
+(Load increment location)
+<'add_loc
+l
+(Increment)
+<x1
++
+(Store increment location)
+<'add_loc
+s
+(Clear carry)
+<x000
+s
+(Return to loop point)
+<'start
+r
+(Increment location)
+'add_loc

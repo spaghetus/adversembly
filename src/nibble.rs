@@ -1,8 +1,14 @@
-use std::ops::*;
+use std::{fmt::Display, ops::*};
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 #[allow(non_camel_case_types)]
 pub struct u4(u8);
+
+impl Display for u4 {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "{}", char::from_digit(self.0 as u32, 16).unwrap_or('?'))
+	}
+}
 
 impl From<u8> for u4 {
 	fn from(value: u8) -> Self {

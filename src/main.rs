@@ -1,20 +1,24 @@
+#[cfg(feature = "assembler")]
+use adversembly::assembler::Syntax;
 use adversembly::{
 	vm::{load_memory_from_file, Vm},
 	widget::Widget,
 };
-use clap::Parser;
+#[cfg(feature = "assembler")]
+use chumsky::Parser;
 use eframe::NativeOptions;
 use egui::{CentralPanel, DragValue};
 use std::{
-	cell::RefCell,
 	path::PathBuf,
-	rc::Rc,
 	time::{Duration, Instant},
 };
 
-#[derive(Parser)]
+#[derive(clap::Parser)]
 struct Args {
 	pub file: Option<PathBuf>,
+	#[cfg(feature = "assembler")]
+	#[arg(short, long)]
+	pub assemble: bool,
 }
 
 struct App {
@@ -99,9 +103,26 @@ impl eframe::App for App {
 }
 
 fn main() {
-	let Args { file } = Args::parse();
-	let memory = if let Some(f) = file {
-		load_memory_from_file(std::fs::read_to_string(f).expect("Failed to read file"))
+	let args = <Args as clap::Parser>::parse();
+	let memory = if let Some(f) = args.file {
+		let file = std::fs::read_to_string(f).expect("Failed to read file");
+		#[cfg(feature = "assembler")]
+		if args.assemble {
+			let mut memory = [None; 256];
+			let program = adversembly::assembler::program()
+				.parse(file)
+				.expect("Parse failure");
+			println!("{program:#?}");
+			let program = Syntax::compile(program);
+			for (addr, data) in program.iter().enumerate() {
+				memory[addr] = Some(*data);
+			}
+			memory
+		} else {
+			load_memory_from_file(file)
+		}
+		#[cfg(not(feature = "assembler"))]
+		load_memory_from_file(file)
 	} else {
 		[None; 256]
 	};

@@ -1,5 +1,4 @@
 use crate::nibble::u4;
-use std::{cell::RefCell, rc::Rc};
 
 primitive_enum::primitive_enum! { Opcode u8 ;
 	/// Nothing
@@ -197,7 +196,7 @@ pub fn load_memory_from_file(data: String) -> [Option<u4>; 256] {
 			continue;
 		}
 		let Some(digit) = c.to_digit(16).map(|v| v as u8) else {
-			panic!("Character {n} at position {n} is not a legal digit")
+			panic!("Character {c} at position {n} is not a legal digit")
 		};
 		memory[n] = Some(digit.into());
 	}
